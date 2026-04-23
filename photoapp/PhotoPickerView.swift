@@ -8,11 +8,42 @@
 import SwiftUI
 
 struct PhotoPickerView: View {
+    
+    var images = imagesMock
+    var onSelect: (ImageItem) -> Void
+    
+    let grid = [
+        GridItem(.adaptive(minimum: 100), spacing: 6)
+    ]
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack {
+            
+            // Top title
+            HStack {
+                Text("Select Photos")
+                    .font(.headline)
+                Spacer()
+            }
+            .padding()
+            
+            ScrollView {
+                LazyVGrid(columns: grid, spacing: 6) {
+                    ForEach(images) { image in
+                        
+                        Image(image.fileName)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(height: 110)
+                            .clipped()
+                            .cornerRadius(10)
+                            .onTapGesture {
+                                onSelect(image)
+                            }
+                    }
+                }
+                .padding(.horizontal)
+            }
+        }
     }
-}
-
-#Preview {
-    PhotoPickerView()
 }

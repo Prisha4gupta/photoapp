@@ -9,6 +9,8 @@ import SwiftUI
 
 struct VideoMemoryView: View {
     @State private var showFriends = false
+    @State private var showMusic = false
+    @State private var showPhotoPicker = false
     var memory: Memory
     
     let grid = [
@@ -71,7 +73,7 @@ struct VideoMemoryView: View {
                 HStack(spacing: 20) {
                     
                     Button {
-                        print("Add media")
+                        showPhotoPicker = true
                     } label: {
                         Image(systemName: "plus")
                             .font(.title2)
@@ -80,17 +82,30 @@ struct VideoMemoryView: View {
                             .background(Color.white.opacity(0.8))
                             .clipShape(Circle())
                     }
-                    
+                    .sheet(isPresented: $showPhotoPicker) {
+                        PhotoPickerView { selectedImage in
+                            print("Selected:", selectedImage.fileName)
+                            showPhotoPicker = false
+                        }
+                        .presentationDetents([ .large])
+                        .presentationDragIndicator(.visible)
+                    }
+
                     Button {
-                        print("Add Audio")
-                    } label: {
-                        Image(systemName: "music.note")
+                            showMusic = true
+                        } label: {
+                            Image(systemName: "music.note")
                             .font(.title2)
                             .foregroundColor(.black)
                             .frame(width: 50, height: 50)
                             .background(Color.white.opacity(0.8))
                             .clipShape(Circle())
                     }
+                        .sheet(isPresented: $showMusic) {
+                            AddMusic()
+                                .presentationDetents([.large])
+                                .presentationDragIndicator(.visible)
+                        }
                 }
                 .padding(.bottom, 2)
             }

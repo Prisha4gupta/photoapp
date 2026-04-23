@@ -3,15 +3,15 @@ import Combine
 struct FriendModel: Identifiable {
     let id = UUID()
     let name: String
-    let color: Color
+    let avatar: String
 }
 
 let localMockFriends = [
-    FriendModel(name: "Willy", color: .gray),
-    FriendModel(name: "Daffa", color: .yellow),
-    FriendModel(name: "Abe", color: .cyan),
-    FriendModel(name: "Farrel", color: .green),
-    FriendModel(name: "Calvin", color: .purple)
+    FriendModel(name: "Willy", avatar: "ava_willy"),
+    FriendModel(name: "Daffa", avatar: "ava_daffa"),
+    FriendModel(name: "Abe", avatar: "ava_abe"),
+    FriendModel(name: "Farrel", avatar: "ava_farrel"),
+    FriendModel(name: "Calvin", avatar: "ava_calvin")
 ]
 
 struct FriendsView: View {
@@ -72,17 +72,25 @@ struct FriendsView: View {
                         let y = sin(animatedAngle) * radius
                         
                         VStack(spacing: 6) {
-                            Circle()
-                                .fill(friend.color)
-                                .frame(width: 54, height: 54)
+
+                            Image(friend.avatar)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 58, height: 58)
+                                .clipShape(Circle())
+                                .overlay(
+                                    Circle().stroke(Color.black, lineWidth: 2)
+                                        .opacity(0.2)
+                                )
+                                .shadow(radius: 4)
+
                             Text(friend.name)
                                 .font(.caption)
                                 .foregroundColor(.primary)
                         }
                         .offset(x: x, y: y)
-                        
                         .scaleEffect(1.1)
-                        .opacity(0.8)
+                        .opacity(0.9)
                     }
                 }
                 .frame(height: 280)

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AlbumView: View {
     @State private var showFriends = false
+    @State private var showPhotoPicker = false
     var memory: Memory
     var body: some View {
     
@@ -74,14 +75,22 @@ struct AlbumView: View {
                // Spacer()
                 
                 Button {
-                    print("Open Library")
+                    showPhotoPicker = true
                 } label: {
                     Image(systemName: "plus")
                         .font(.title2)
                         .foregroundColor(.black)
-                        .frame(width: 56, height: 56)
-                        .background(Color.gray.opacity(0.15))
+                        .frame(width: 50, height: 50)
+                        .background(Color.white.opacity(0.8))
                         .clipShape(Circle())
+                }
+                .sheet(isPresented: $showPhotoPicker) {
+                    PhotoPickerView { selectedImage in
+                        print("Selected:", selectedImage.fileName)
+                        showPhotoPicker = false
+                    }
+                    .presentationDetents([ .large])
+                    .presentationDragIndicator(.visible)
                 }
                 .padding()
             }

@@ -6,11 +6,17 @@
 //
 
 import SwiftUI
+import Combine
 
 struct VideoMemoryView: View {
     @State private var showFriends = false
     @State private var showMusic = false
     @State private var showPhotoPicker = false
+
+    @State private var isPlaying = false
+    @State private var currentImageIndex = 0
+    let timer = Timer.publish(every: 1.5, on: .main, in: .common).autoconnect()
+    
     @Binding var memory: Memory
     
     let grid = [
@@ -25,46 +31,65 @@ struct VideoMemoryView: View {
             VStack(spacing: 16) {
                 
                 ZStack {
-                    Image(memory.coverImage)
+                    let displayImage = (isPlaying && !memory.items.isEmpty) ? memory.items[currentImageIndex].fileName : memory.coverImage
+                    
+                    Image(displayImage)
                         .resizable()
                         .scaledToFill()
                         .frame(height: 300)
                         .clipped()
                         .cornerRadius(12)
-                    
-
-                    Color.black.opacity(0.3)
+                        .transition(.opacity)
+                        .id(displayImage)
+                    Color.black.opacity(isPlaying ? 0.1 : 0.3)
                         .cornerRadius(12)
                     
                     Button {
-                        print("Play video")
+                        withAnimation {
+                            if isPlaying {
+                                isPlaying = false
+                                currentImageIndex = 0
+                            } else {
+                                if !memory.items.isEmpty {
+                                    isPlaying = true
+                                }
+                            }
+                        }
                     } label: {
                         HStack(spacing: 6) {
-                            Image(systemName: "play.fill")
-                            Text("Play")
+                            Image(systemName: isPlaying ? "stop.fill" : "play.fill")
+                            Text(isPlaying ? "Stop" : "Play")
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
-                        .background(Color.white.opacity(0.1))
+                        .background(Color.white.opacity(isPlaying ? 0.8 : 0.1))
+                        .foregroundColor(isPlaying ? .black : .white)
                         .clipShape(Capsule())
                     }
                 }
                 .padding(.horizontal)
+                .onReceive(timer) { _ in
+                    if isPlaying && !memory.items.isEmpty {
+                        withAnimation(.easeInOut(duration: 0.5)) {
+                            currentImageIndex = (currentImageIndex + 1) % memory.items.count
+                        }
+                    }
+                }
 
                 if let song = memory.selectedMusic {
-                                    HStack {
-                                        Image(systemName: "music.note")
-                                        Text("\(song.title) - \(song.artist)")
-                                            .font(.subheadline)
-                                    }
-                                    .foregroundColor(.blue)
-                                    .padding(.horizontal)
-                    } else {
-                        Text(memory.subtitle)
+                    HStack {
+                        Image(systemName: "music.note")
+                        Text("\(song.title) - \(song.artist)")
                             .font(.subheadline)
-                            .foregroundColor(.gray)
-                            .padding(.horizontal)
                     }
+                    .foregroundColor(.blue)
+                    .padding(.horizontal)
+                } else {
+                    Text(memory.subtitle)
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                        .padding(.horizontal)
+                }
                 
                 
                 ScrollView {
@@ -149,6 +174,3 @@ struct VideoMemoryView: View {
             }
     }
 }
-
-
-
